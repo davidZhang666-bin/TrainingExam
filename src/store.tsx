@@ -1,14 +1,14 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
 import { courses, type LearningState, type Profile, type Draft, type Attempt } from './domain';
 
-import { initialState, loadState, localDate, STORAGE_KEY } from './persistence';
+import { initialState, loadState, localDate, STORAGE_KEY, normalizeState } from './persistence';
 export { initialState, loadState, localDate, STORAGE_KEY } from './persistence';
 type Store = {
   state: LearningState; storageError: boolean;
   enroll: (id: string) => void; toggleFavorite: (id: string) => void;
   completeLesson: (id: string) => void; saveNote: (id: string, text: string) => void;
   updateProfile: (profile: Profile) => void; saveDraft: (draft: Draft | null) => void;
-  addAttempt: (attempt: Attempt) => void; readNotifications: (ids: string[]) => void; reset: () => void;
+  addAttempt: (attempt: Attempt) => void; readNotifications: (ids: string[]) => void; reset: () => void; restore: (data: LearningState) => void;
 };
 const Context = createContext<Store | null>(null);
 export function LearningProvider({ children }: { children: ReactNode }) {
@@ -33,6 +33,7 @@ export function LearningProvider({ children }: { children: ReactNode }) {
     addAttempt: attempt => setState(s => s.attempts.some(a => a.id === attempt.id) ? s : ({ ...s, attempts: [...s.attempts, attempt], draft: null })),
     readNotifications: ids => setState(s => ({ ...s, readNotifications: [...new Set([...s.readNotifications, ...ids])] })),
     reset: () => setState(initialState()),
+    restore: data => setState(normalizeState(data)),
   };
   return <Context.Provider value={value}>{children}</Context.Provider>;
 }

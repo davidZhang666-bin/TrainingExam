@@ -48,3 +48,11 @@ test('global search focuses its input and keeps keyboard focus in dialog',async(
 test('all pages fit the viewport without horizontal overflow',async({page})=>{
   for(const hash of ['dashboard','catalog','learning','exams','certificates','analytics','settings']){await page.goto('/#'+hash);await expect(page.locator('main')).toBeVisible();expect(await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth)).toBe(true);}
 });
+
+test('backup import requires review and restores profile after reload',async({page})=>{
+  await page.goto('/#settings');const downloadPromise=page.waitForEvent('download');await page.getByRole('button',{name:'导出备份',exact:true}).click();const file=await downloadPromise;const path=await file.path();expect(path).toBeTruthy();
+  await page.getByLabel('姓名',{exact:true}).fill('测试学员');await page.getByRole('button',{name:'保存设置'}).click();await expect(page.getByText('设置已保存',{exact:true})).toBeVisible();
+  await page.getByLabel('选择学习备份文件').setInputFiles(path!);await expect(page.getByRole('dialog',{name:'确认导入备份'})).toBeVisible();await expect(page.getByLabel('姓名',{exact:true})).toHaveValue('测试学员');
+  await page.getByRole('button',{name:'确认恢复备份'}).click();await expect(page.getByLabel('姓名',{exact:true})).toHaveValue('林小满');await page.reload();await expect(page.getByLabel('姓名',{exact:true})).toHaveValue('林小满');
+  await page.getByLabel('选择学习备份文件').setInputFiles({name:'invalid.json',mimeType:'application/json',buffer:Buffer.from('{}')});await expect(page.getByRole('alert')).toContainText('请选择由知序学习导出的');await expect(page.getByLabel('姓名',{exact:true})).toHaveValue('林小满');
+});
