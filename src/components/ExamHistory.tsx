@@ -3,7 +3,118 @@ import { ArrowUpRight, History, NotebookTabs } from 'lucide-react';
 import { exams, type Attempt } from '../domain';
 import { useLearning } from '../store';
 export default function ExamHistory({ onReview }: { onReview: (a: Attempt) => void }) {
-  const { state }=useLearning(); const [tab,setTab]=useState('history');
-  const latest=exams.flatMap(e=>{const a=state.attempts.filter(a=>a.examId===e.id).at(-1);return a?e.questions.filter(q=>a.answers[q.id]!==q.answer).map(q=>({question:q,exam:e,answer:a.answers[q.id]})):[];});
-  return <section className="exam-history"><div className="panel-heading"><h2>每一次尝试，都值得记录</h2><div className="filter-tabs"><button className={tab==='history'?'active':''} onClick={()=>setTab('history')} aria-pressed={tab==='history'}>考试记录 {state.attempts.length}</button><button className={tab==='wrong'?'active':''} onClick={()=>setTab('wrong')} aria-pressed={tab==='wrong'}>错题复习 {latest.length}</button></div></div>{tab==='history' ? state.attempts.length ? <div className="panel table-container"><table><thead><tr><th>测评名称</th><th>交卷时间</th><th>成绩</th><th>结果</th><th><span className="visually-hidden">操作</span></th></tr></thead><tbody>{[...state.attempts].reverse().map(a=>{const exam=exams.find(e=>e.id===a.examId)!;return <tr key={a.id}><td>{exam.title}</td><td>{new Date(a.submittedAt).toLocaleString('zh-CN')}</td><td><strong>{a.score}</strong> 分</td><td><span className={`badge ${a.score>=exam.pass?'green':'peach'}`}>{a.score>=exam.pass?'已通过':'待提升'}</span></td><td><button className="text-button" onClick={()=>onReview(a)}>查看解析<ArrowUpRight size={12}/></button></td></tr>;})}</tbody></table></div> : <div className="panel empty-state compact"><History size={28}/><h3>还没有考试记录</h3><p>完成一次测评，这里就会留下你的成长足迹。</p></div> : latest.length ? <div className="stack"><p className="wrongbook-note">按每场考试最近一次作答整理；重新挑战答对后，错题会自动移除。</p>{latest.map(({question:q,exam,answer})=><details className="panel wrong-question" key={q.id}><summary><span className="badge peach">{exam.category}</span>{q.text}<NotebookTabs size={15}/></summary><div><p>你的答案：{answer===undefined?'未作答':q.options[answer]}</p><p className="correct-answer">正确答案：{q.options[q.answer]}</p><div className="answer-explanation"><strong>知识解析</strong><p>{q.explanation}</p></div></div></details>)}</div> : <div className="panel empty-state compact"><NotebookTabs size={28}/><h3>{state.attempts.length?'暂时没有错题，继续保持！':'错题复习，帮助你更好地理解'}</h3><p>完成测评后，答错和未作答的题目会在这里归纳。</p></div>}</section>;
+  const { state } = useLearning();
+  const [tab, setTab] = useState('history');
+  const latest = exams.flatMap((e) => {
+    const a = state.attempts.filter((a) => a.examId === e.id).at(-1);
+    return a
+      ? e.questions
+          .filter((q) => a.answers[q.id] !== q.answer)
+          .map((q) => ({ question: q, exam: e, answer: a.answers[q.id] }))
+      : [];
+  });
+  return (
+    <section className="exam-history">
+      <div className="panel-heading">
+        <h2>每一次尝试，都值得记录</h2>
+        <div className="filter-tabs">
+          <button
+            className={tab === 'history' ? 'active' : ''}
+            onClick={() => setTab('history')}
+            aria-pressed={tab === 'history'}
+          >
+            考试记录 {state.attempts.length}
+          </button>
+          <button
+            className={tab === 'wrong' ? 'active' : ''}
+            onClick={() => setTab('wrong')}
+            aria-pressed={tab === 'wrong'}
+          >
+            错题复习 {latest.length}
+          </button>
+        </div>
+      </div>
+      {tab === 'history' ? (
+        state.attempts.length ? (
+          <div className="panel table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>测评名称</th>
+                  <th>交卷时间</th>
+                  <th>成绩</th>
+                  <th>结果</th>
+                  <th>
+                    <span className="visually-hidden">操作</span>
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {[...state.attempts].reverse().map((a) => {
+                  const exam = exams.find((e) => e.id === a.examId)!;
+                  return (
+                    <tr key={a.id}>
+                      <td>{exam.title}</td>
+                      <td>{new Date(a.submittedAt).toLocaleString('zh-CN')}</td>
+                      <td>
+                        <strong>{a.score}</strong> 分
+                      </td>
+                      <td>
+                        <span className={`badge ${a.score >= exam.pass ? 'green' : 'peach'}`}>
+                          {a.score >= exam.pass ? '已通过' : '待提升'}
+                        </span>
+                      </td>
+                      <td>
+                        <button className="text-button" onClick={() => onReview(a)}>
+                          查看解析
+                          <ArrowUpRight size={12} />
+                        </button>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        ) : (
+          <div className="panel empty-state compact">
+            <History size={28} />
+            <h3>还没有考试记录</h3>
+            <p>完成一次测评，这里就会留下你的成长足迹。</p>
+          </div>
+        )
+      ) : latest.length ? (
+        <div className="stack">
+          <p className="wrongbook-note">
+            按每场考试最近一次作答整理；重新挑战答对后，错题会自动移除。
+          </p>
+          {latest.map(({ question: q, exam, answer }) => (
+            <details className="panel wrong-question" key={q.id}>
+              <summary>
+                <span className="badge peach">{exam.category}</span>
+                {q.text}
+                <NotebookTabs size={15} />
+              </summary>
+              <div>
+                <p>你的答案：{answer === undefined ? '未作答' : q.options[answer]}</p>
+                <p className="correct-answer">正确答案：{q.options[q.answer]}</p>
+                <div className="answer-explanation">
+                  <strong>知识解析</strong>
+                  <p>{q.explanation}</p>
+                </div>
+              </div>
+            </details>
+          ))}
+        </div>
+      ) : (
+        <div className="panel empty-state compact">
+          <NotebookTabs size={28} />
+          <h3>
+            {state.attempts.length ? '暂时没有错题，继续保持！' : '错题复习，帮助你更好地理解'}
+          </h3>
+          <p>完成测评后，答错和未作答的题目会在这里归纳。</p>
+        </div>
+      )}
+    </section>
+  );
 }

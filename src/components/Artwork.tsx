@@ -1,6 +1,98 @@
 export function HeroArt() {
-  return <svg className="hero-art" viewBox="0 0 400 260" fill="none" aria-hidden="true"><defs><linearGradient id="book" x1="150" y1="50" x2="310" y2="220" gradientUnits="userSpaceOnUse"><stop stopColor="#d9cbff"/><stop offset="1" stopColor="#b7a0ec"/></linearGradient></defs><circle cx="253" cy="119" r="100" stroke="#ffffff32"/><circle cx="253" cy="119" r="120" stroke="#ffffff18"/><path d="M93 208 265 244 359 190 192 157Z" fill="#65549e" opacity=".3"/><path d="m130 172 152 29 54-43-146-33z" fill="#ddd3ee"/><path d="m130 172 1 13 151 30v-14z" fill="#eee7f9"/><path d="m282 201 54-43v13l-54 44z" fill="#b9a4db"/><path d="m164 64 71-25 71 24v127l-71 25-71-24z" fill="url(#book)"/><path d="m235 39-1 153 72-24V63z" fill="#f7f0ff"/><path d="m235 192-71-24v23l71 24 71-25v-22z" fill="#e6d9fc"/><path d="m176 79 45 14m-45 1 45 14m-45 1 45 14m-45 1 29 9m42-41 44-15m-44 30 44-15m-44 30 44-15" stroke="#b7a2db" strokeWidth="3" strokeLinecap="round"/><path d="m260 50 15 5v44l-7-5-8 10z" fill="#9b80ce"/><circle cx="130" cy="91" r="22" fill="#d6c5f3"/><path d="m326 76 4-12 4 12 12 4-12 4-4 12-4-12-12-4z" fill="#e1d1ff"/><circle cx="327" cy="215" r="6" fill="#d7c4ef"/><path d="M94 201c-14-38-5-74 27-109M351 117c19 29 18 62-8 87" stroke="#d8c7f4" strokeDasharray="3 6" opacity=".6"/></svg>;
+  return (
+    <svg className="hero-art" viewBox="0 0 400 260" fill="none" aria-hidden="true">
+      <defs>
+        <linearGradient id="book" x1="150" y1="50" x2="310" y2="220" gradientUnits="userSpaceOnUse">
+          <stop stopColor="#d9cbff" />
+          <stop offset="1" stopColor="#b7a0ec" />
+        </linearGradient>
+      </defs>
+      <circle cx="253" cy="119" r="100" stroke="#ffffff32" />
+      <circle cx="253" cy="119" r="120" stroke="#ffffff18" />
+      <path d="M93 208 265 244 359 190 192 157Z" fill="#65549e" opacity=".3" />
+      <path d="m130 172 152 29 54-43-146-33z" fill="#ddd3ee" />
+      <path d="m130 172 1 13 151 30v-14z" fill="#eee7f9" />
+      <path d="m282 201 54-43v13l-54 44z" fill="#b9a4db" />
+      <path d="m164 64 71-25 71 24v127l-71 25-71-24z" fill="url(#book)" />
+      <path d="m235 39-1 153 72-24V63z" fill="#f7f0ff" />
+      <path d="m235 192-71-24v23l71 24 71-25v-22z" fill="#e6d9fc" />
+      <path
+        d="m176 79 45 14m-45 1 45 14m-45 1 45 14m-45 1 29 9m42-41 44-15m-44 30 44-15m-44 30 44-15"
+        stroke="#b7a2db"
+        strokeWidth="3"
+        strokeLinecap="round"
+      />
+      <path d="m260 50 15 5v44l-7-5-8 10z" fill="#9b80ce" />
+      <circle cx="130" cy="91" r="22" fill="#d6c5f3" />
+      <path d="m326 76 4-12 4 12 12 4-12 4-4 12-4-12-12-4z" fill="#e1d1ff" />
+      <circle cx="327" cy="215" r="6" fill="#d7c4ef" />
+      <path
+        d="M94 201c-14-38-5-74 27-109M351 117c19 29 18 62-8 87"
+        stroke="#d8c7f4"
+        strokeDasharray="3 6"
+        opacity=".6"
+      />
+    </svg>
+  );
 }
 export function CourseArt({ kind }: { kind: string }) {
-  return <svg className="course-art" viewBox="0 0 300 150" fill="none" aria-hidden="true"><circle cx="245" cy="13" r="85" stroke="currentColor" opacity=".12"/><circle cx="245" cy="13" r="65" stroke="currentColor" opacity=".12"/>{kind === 'design' ? <><path d="m110 35 71 18-18 71-71-18z" fill="currentColor" opacity=".15"/><path d="m133 33 64 39-39 64-64-39z" stroke="currentColor" opacity=".35"/><circle cx="151" cy="80" r="30" fill="currentColor" opacity=".6"/><path d="m133 81 14 14 24-30" stroke="white" strokeWidth="3"/><circle cx="83" cy="39" r="9" fill="currentColor" opacity=".25"/></> : kind === 'data' ? <><rect x="77" y="36" width="147" height="86" rx="7" fill="white" opacity=".6"/>{[20,36,26,50].map((h,i)=><rect key={i} x={95+i*31} y={107-h} width="18" height={h} rx="3" fill="currentColor" opacity={.3+i*.1}/>)}<path d="m99 72 33-21 34 8 31-25" stroke="currentColor" strokeWidth="2"/></> : kind === 'talk' ? <><rect x="83" y="35" width="91" height="58" rx="16" fill="currentColor" opacity=".5"/><path d="m104 90-2 17 22-17" fill="currentColor" opacity=".5"/><rect x="142" y="70" width="77" height="49" rx="14" fill="white" opacity=".8"/><path d="m197 114 10 17-1-19" fill="white" opacity=".8"/><path d="M103 55h49m-49 13h32m27 21h38m-38 12h26" stroke="white" strokeWidth="3"/></> : <><path d="m150 25 48 20v33c0 31-48 54-48 54s-48-23-48-54V45z" fill="currentColor" opacity=".25"/><path d="m150 38 36 15v26c0 20-36 40-36 40s-36-20-36-40V53z" stroke="currentColor" opacity=".7"/><path d="m133 75 13 13 24-26" stroke="currentColor" strokeWidth="4" strokeLinecap="round"/></>}</svg>;
+  return (
+    <svg className="course-art" viewBox="0 0 300 150" fill="none" aria-hidden="true">
+      <circle cx="245" cy="13" r="85" stroke="currentColor" opacity=".12" />
+      <circle cx="245" cy="13" r="65" stroke="currentColor" opacity=".12" />
+      {kind === 'design' ? (
+        <>
+          <path d="m110 35 71 18-18 71-71-18z" fill="currentColor" opacity=".15" />
+          <path d="m133 33 64 39-39 64-64-39z" stroke="currentColor" opacity=".35" />
+          <circle cx="151" cy="80" r="30" fill="currentColor" opacity=".6" />
+          <path d="m133 81 14 14 24-30" stroke="white" strokeWidth="3" />
+          <circle cx="83" cy="39" r="9" fill="currentColor" opacity=".25" />
+        </>
+      ) : kind === 'data' ? (
+        <>
+          <rect x="77" y="36" width="147" height="86" rx="7" fill="white" opacity=".6" />
+          {[20, 36, 26, 50].map((h, i) => (
+            <rect
+              key={i}
+              x={95 + i * 31}
+              y={107 - h}
+              width="18"
+              height={h}
+              rx="3"
+              fill="currentColor"
+              opacity={0.3 + i * 0.1}
+            />
+          ))}
+          <path d="m99 72 33-21 34 8 31-25" stroke="currentColor" strokeWidth="2" />
+        </>
+      ) : kind === 'talk' ? (
+        <>
+          <rect x="83" y="35" width="91" height="58" rx="16" fill="currentColor" opacity=".5" />
+          <path d="m104 90-2 17 22-17" fill="currentColor" opacity=".5" />
+          <rect x="142" y="70" width="77" height="49" rx="14" fill="white" opacity=".8" />
+          <path d="m197 114 10 17-1-19" fill="white" opacity=".8" />
+          <path d="M103 55h49m-49 13h32m27 21h38m-38 12h26" stroke="white" strokeWidth="3" />
+        </>
+      ) : (
+        <>
+          <path
+            d="m150 25 48 20v33c0 31-48 54-48 54s-48-23-48-54V45z"
+            fill="currentColor"
+            opacity=".25"
+          />
+          <path
+            d="m150 38 36 15v26c0 20-36 40-36 40s-36-20-36-40V53z"
+            stroke="currentColor"
+            opacity=".7"
+          />
+          <path
+            d="m133 75 13 13 24-26"
+            stroke="currentColor"
+            strokeWidth="4"
+            strokeLinecap="round"
+          />
+        </>
+      )}
+    </svg>
+  );
 }

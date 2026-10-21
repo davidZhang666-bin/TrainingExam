@@ -1,5 +1,12 @@
 import { useState } from 'react';
-import { ArrowRight, ClipboardCheck, Clock3, FileQuestion, ShieldCheck, BookOpen } from 'lucide-react';
+import {
+  ArrowRight,
+  ClipboardCheck,
+  Clock3,
+  FileQuestion,
+  ShieldCheck,
+  BookOpen,
+} from 'lucide-react';
 import { exams, courses, type Exam, type Attempt } from '../domain';
 import { useLearning } from '../store';
 import PageIntro from '../components/PageIntro';
@@ -7,9 +14,128 @@ import Modal from '../components/Modal';
 import ExamRunner from '../components/ExamRunner';
 import ExamResult from '../components/ExamResult';
 import ExamHistory from '../components/ExamHistory';
-export default function Exams({ onLearn, onCertificates }: { onLearn: (id: string) => void; onCertificates: () => void }) {
-  const { state, saveDraft } = useLearning(); const [selected,setSelected] = useState<Exam | null>(null); const [agreed,setAgreed] = useState(false); const [review,setReview] = useState<Attempt | null>(null);
-  if (state.draft) return <ExamRunner exam={exams.find(e=>e.id===state.draft!.examId)!} onFinish={setReview}/>;
-  if (review) return <ExamResult attempt={review} onBack={()=>setReview(null)} onCertificates={onCertificates}/>;
-  return <><PageIntro title="让所学，成为真正的能力" subtitle="一次小小的检验，让理解更深一层，让成长有迹可循。" eyebrow="TURN KNOWLEDGE INTO CONFIDENCE"/><div className="exam-intro"><ShieldCheck size={20}/><p>独立思考，认真作答。每场测评均可重新挑战，通过后即可领取学习证书。</p><span>单选题 · 自动评分</span></div><div className="exam-grid">{exams.map((exam,i)=> {const attempts = state.attempts.filter(a=>a.examId===exam.id); const passed = attempts.some(a=>a.score>=exam.pass); return <article className="panel exam-card" key={exam.id}><div className="exam-card-top"><span className={`exam-symbol ${['purple','peach','blue'][i]}`}><ClipboardCheck size={25} strokeWidth={1.4}/></span><span className={`badge ${passed?'green':''}`}>{passed?'已通过':'待挑战'}</span></div><span className="eyebrow">ASSESSMENT 0{i+1}</span><h2>{exam.title}</h2><p>{exam.category} · {courses.find(c=>c.id===exam.courseId)?.title}</p><div className="exam-specs"><span><Clock3 size={14}/>{exam.minutes} 分钟</span><span><FileQuestion size={14}/>{exam.questions.length} 道题</span><span>{exam.pass} 分及格</span></div><div className="exam-personal"><span>历史最佳</span><strong>{attempts.length ? Math.max(...attempts.map(a=>a.score))+' 分' : '尚未测评'}</strong></div><button className="button primary wide" onClick={()=>{setSelected(exam);setAgreed(false);}}>{passed?'再次挑战':'开始测评'}<ArrowRight size={14}/></button><button className="text-button exam-learn" onClick={()=>onLearn(exam.courseId)}><BookOpen size={12}/>先回顾相关课程</button></article>;})}</div><ExamHistory onReview={setReview}/>{selected && <Modal title="考前须知" onClose={()=>setSelected(null)} className="exam-rules"><span className="eyebrow">BEFORE YOU BEGIN</span><h2>{selected.title}</h2><p>准备好了吗？为你的努力，做一次认真的检验。</p><ul><li>共 {selected.questions.length} 道单选题，每题 {100/selected.questions.length} 分，{selected.pass} 分及格。</li><li>考试时长 {selected.minutes} 分钟，开始后持续计时，离开页面也不会暂停。</li><li>答案自动保存到当前浏览器；倒计时结束将自动交卷。</li><li>可自由切换题目。交卷后将展示成绩和每题解析。</li></ul><label className="agreement"><input type="checkbox" checked={agreed} onChange={e=>setAgreed(e.target.checked)}/>我已阅读须知，准备开始独立作答</label><button className="button primary wide" disabled={!agreed} onClick={()=>{saveDraft({examId:selected.id,answers:{},deadline:Date.now()+selected.minutes*60000,index:0});setSelected(null);}}>正式开始<ArrowRight size={14}/></button></Modal>}</>;
+export default function Exams({
+  onLearn,
+  onCertificates,
+}: {
+  onLearn: (id: string) => void;
+  onCertificates: () => void;
+}) {
+  const { state, saveDraft } = useLearning();
+  const [selected, setSelected] = useState<Exam | null>(null);
+  const [agreed, setAgreed] = useState(false);
+  const [review, setReview] = useState<Attempt | null>(null);
+  if (state.draft)
+    return (
+      <ExamRunner exam={exams.find((e) => e.id === state.draft!.examId)!} onFinish={setReview} />
+    );
+  if (review)
+    return (
+      <ExamResult attempt={review} onBack={() => setReview(null)} onCertificates={onCertificates} />
+    );
+  return (
+    <>
+      <PageIntro
+        title="让所学，成为真正的能力"
+        subtitle="一次小小的检验，让理解更深一层，让成长有迹可循。"
+        eyebrow="TURN KNOWLEDGE INTO CONFIDENCE"
+      />
+      <div className="exam-intro">
+        <ShieldCheck size={20} />
+        <p>独立思考，认真作答。每场测评均可重新挑战，通过后即可领取学习证书。</p>
+        <span>单选题 · 自动评分</span>
+      </div>
+      <div className="exam-grid">
+        {exams.map((exam, i) => {
+          const attempts = state.attempts.filter((a) => a.examId === exam.id);
+          const passed = attempts.some((a) => a.score >= exam.pass);
+          return (
+            <article className="panel exam-card" key={exam.id}>
+              <div className="exam-card-top">
+                <span className={`exam-symbol ${['purple', 'peach', 'blue'][i]}`}>
+                  <ClipboardCheck size={25} strokeWidth={1.4} />
+                </span>
+                <span className={`badge ${passed ? 'green' : ''}`}>
+                  {passed ? '已通过' : '待挑战'}
+                </span>
+              </div>
+              <span className="eyebrow">ASSESSMENT 0{i + 1}</span>
+              <h2>{exam.title}</h2>
+              <p>
+                {exam.category} · {courses.find((c) => c.id === exam.courseId)?.title}
+              </p>
+              <div className="exam-specs">
+                <span>
+                  <Clock3 size={14} />
+                  {exam.minutes} 分钟
+                </span>
+                <span>
+                  <FileQuestion size={14} />
+                  {exam.questions.length} 道题
+                </span>
+                <span>{exam.pass} 分及格</span>
+              </div>
+              <div className="exam-personal">
+                <span>历史最佳</span>
+                <strong>
+                  {attempts.length ? Math.max(...attempts.map((a) => a.score)) + ' 分' : '尚未测评'}
+                </strong>
+              </div>
+              <button
+                className="button primary wide"
+                onClick={() => {
+                  setSelected(exam);
+                  setAgreed(false);
+                }}
+              >
+                {passed ? '再次挑战' : '开始测评'}
+                <ArrowRight size={14} />
+              </button>
+              <button className="text-button exam-learn" onClick={() => onLearn(exam.courseId)}>
+                <BookOpen size={12} />
+                先回顾相关课程
+              </button>
+            </article>
+          );
+        })}
+      </div>
+      <ExamHistory onReview={setReview} />
+      {selected && (
+        <Modal title="考前须知" onClose={() => setSelected(null)} className="exam-rules">
+          <span className="eyebrow">BEFORE YOU BEGIN</span>
+          <h2>{selected.title}</h2>
+          <p>准备好了吗？为你的努力，做一次认真的检验。</p>
+          <ul>
+            <li>
+              共 {selected.questions.length} 道单选题，每题 {100 / selected.questions.length} 分，
+              {selected.pass} 分及格。
+            </li>
+            <li>考试时长 {selected.minutes} 分钟，开始后持续计时，离开页面也不会暂停。</li>
+            <li>答案自动保存到当前浏览器；倒计时结束将自动交卷。</li>
+            <li>可自由切换题目。交卷后将展示成绩和每题解析。</li>
+          </ul>
+          <label className="agreement">
+            <input type="checkbox" checked={agreed} onChange={(e) => setAgreed(e.target.checked)} />
+            我已阅读须知，准备开始独立作答
+          </label>
+          <button
+            className="button primary wide"
+            disabled={!agreed}
+            onClick={() => {
+              saveDraft({
+                examId: selected.id,
+                answers: {},
+                deadline: Date.now() + selected.minutes * 60000,
+                index: 0,
+              });
+              setSelected(null);
+            }}
+          >
+            正式开始
+            <ArrowRight size={14} />
+          </button>
+        </Modal>
+      )}
+    </>
+  );
 }

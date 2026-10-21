@@ -1,20 +1,231 @@
 import { useState } from 'react';
-import { ArrowLeft, ArrowRight, BookOpen, CheckCircle2, Circle, Clock3, GraduationCap } from 'lucide-react';
+import {
+  ArrowLeft,
+  ArrowRight,
+  BookOpen,
+  CheckCircle2,
+  Circle,
+  Clock3,
+  GraduationCap,
+} from 'lucide-react';
 import { courses, courseProgress } from '../domain';
 import { useLearning } from '../store';
 import PageIntro from '../components/PageIntro';
 import LessonNotes from '../components/LessonNotes';
 import { CourseArt } from '../components/Artwork';
-export default function Learning({ courseId, onSelect, onCatalog, onExam }: { courseId: string | null; onSelect: (id: string | null) => void; onCatalog: () => void; onExam: () => void }) {
-  const { state, completeLesson } = useLearning(); const [status,setStatus] = useState('全部');
-  const course = courses.find(c => c.id === courseId && state.enrolled.includes(c.id));
-  const [index,setIndex] = useState(() => Math.max(0,course?.lessons.findIndex(l => !state.completed.includes(l.id)) ?? 0));
+export default function Learning({
+  courseId,
+  onSelect,
+  onCatalog,
+  onExam,
+}: {
+  courseId: string | null;
+  onSelect: (id: string | null) => void;
+  onCatalog: () => void;
+  onExam: () => void;
+}) {
+  const { state, completeLesson } = useLearning();
+  const [status, setStatus] = useState('全部');
+  const course = courses.find((c) => c.id === courseId && state.enrolled.includes(c.id));
+  const [index, setIndex] = useState(() =>
+    Math.max(0, course?.lessons.findIndex((l) => !state.completed.includes(l.id)) ?? 0),
+  );
   if (!course) {
-    const enrolled = courses.filter(c => state.enrolled.includes(c.id) && (status === '全部' || (status === '已完成' ? courseProgress(c,state.completed) === 100 : courseProgress(c,state.completed) < 100)));
-    return <><PageIntro title="我的学习" subtitle="不用着急，按自己的节奏，把每一份知识变成力量。" eyebrow="YOUR PERSONAL LEARNING PATH"><button className="button" onClick={onCatalog}>探索更多课程 <ArrowRight size={14}/></button></PageIntro><div className="toolbar"><div className="filter-tabs">{['全部','学习中','已完成'].map(s => <button key={s} className={status === s ? 'active' : ''} aria-pressed={status === s} onClick={() => setStatus(s)}>{s}</button>)}</div><span className="results-count toolbar-spacer">{enrolled.length} 门课程</span></div><div className="learning-list">{enrolled.map(c => <article className="panel learning-list-card" key={c.id}><div className={`learning-list-cover ${c.color}`}><CourseArt kind={c.art}/></div><div className="learning-list-info"><span className="badge">{c.category}</span><h2>{c.title}</h2><p>{c.subtitle}</p><div className="learning-list-progress"><div className="progress-track"><span style={{width:courseProgress(c,state.completed)+'%'}}/></div><span>{courseProgress(c,state.completed)}%</span></div><small>已完成 {c.lessons.filter(l=>state.completed.includes(l.id)).length} / {c.lessons.length} 个章节 · {c.instructor}</small></div><button className="button primary" onClick={() => onSelect(c.id)}>{courseProgress(c,state.completed) === 100 ? '回顾课程' : '继续学习'}<ArrowRight size={14}/></button></article>)}</div>{!enrolled.length && <div className="panel empty-state"><GraduationCap size={38}/><h3>新的学习旅程，从一门好课开始</h3><p>当前分类下还没有课程，去课程中心发现感兴趣的内容吧。</p><button className="button primary" onClick={onCatalog}>发现课程</button></div>}</>;
+    const enrolled = courses.filter(
+      (c) =>
+        state.enrolled.includes(c.id) &&
+        (status === '全部' ||
+          (status === '已完成'
+            ? courseProgress(c, state.completed) === 100
+            : courseProgress(c, state.completed) < 100)),
+    );
+    return (
+      <>
+        <PageIntro
+          title="我的学习"
+          subtitle="不用着急，按自己的节奏，把每一份知识变成力量。"
+          eyebrow="YOUR PERSONAL LEARNING PATH"
+        >
+          <button className="button" onClick={onCatalog}>
+            探索更多课程 <ArrowRight size={14} />
+          </button>
+        </PageIntro>
+        <div className="toolbar">
+          <div className="filter-tabs">
+            {['全部', '学习中', '已完成'].map((s) => (
+              <button
+                key={s}
+                className={status === s ? 'active' : ''}
+                aria-pressed={status === s}
+                onClick={() => setStatus(s)}
+              >
+                {s}
+              </button>
+            ))}
+          </div>
+          <span className="results-count toolbar-spacer">{enrolled.length} 门课程</span>
+        </div>
+        <div className="learning-list">
+          {enrolled.map((c) => (
+            <article className="panel learning-list-card" key={c.id}>
+              <div className={`learning-list-cover ${c.color}`}>
+                <CourseArt kind={c.art} />
+              </div>
+              <div className="learning-list-info">
+                <span className="badge">{c.category}</span>
+                <h2>{c.title}</h2>
+                <p>{c.subtitle}</p>
+                <div className="learning-list-progress">
+                  <div className="progress-track">
+                    <span style={{ width: courseProgress(c, state.completed) + '%' }} />
+                  </div>
+                  <span>{courseProgress(c, state.completed)}%</span>
+                </div>
+                <small>
+                  已完成 {c.lessons.filter((l) => state.completed.includes(l.id)).length} /{' '}
+                  {c.lessons.length} 个章节 · {c.instructor}
+                </small>
+              </div>
+              <button className="button primary" onClick={() => onSelect(c.id)}>
+                {courseProgress(c, state.completed) === 100 ? '回顾课程' : '继续学习'}
+                <ArrowRight size={14} />
+              </button>
+            </article>
+          ))}
+        </div>
+        {!enrolled.length && (
+          <div className="panel empty-state">
+            <GraduationCap size={38} />
+            <h3>新的学习旅程，从一门好课开始</h3>
+            <p>当前分类下还没有课程，去课程中心发现感兴趣的内容吧。</p>
+            <button className="button primary" onClick={onCatalog}>
+              发现课程
+            </button>
+          </div>
+        )}
+      </>
+    );
   }
   const lesson = course.lessons[index];
   const done = state.completed.includes(lesson.id);
-  const canComplete = course.lessons.slice(0,index).every(l => state.completed.includes(l.id));
-  return <><button className="text-button back-link" onClick={() => onSelect(null)}><ArrowLeft size={14}/>返回我的学习</button><PageIntro title={course.title} subtitle={course.subtitle} eyebrow="FOCUS ON YOUR NEXT STEP"/><div className="lesson-workspace"><aside className="panel lesson-sidebar"><div className="lesson-sidebar-title"><h3>课程目录</h3><span>{courseProgress(course,state.completed)}%</span></div><div className="progress-track"><span style={{width:courseProgress(course,state.completed)+'%'}}/></div><nav aria-label="章节导航">{course.lessons.map((l,i)=><button key={l.id} className={`lesson-nav ${index===i?'active':''}`} aria-current={index===i?'step':undefined} onClick={()=>setIndex(i)}>{state.completed.includes(l.id)?<CheckCircle2 size={16}/>:<Circle size={16}/>}<span><strong>{String(i+1).padStart(2,'0')} · {l.title}</strong><small>{l.minutes} 分钟 · 图文课程</small></span></button>)}</nav><div className="lesson-sidebar-tip"><BookOpen size={16}/><p>慢慢读，认真想。<br/>学习不止于完成。</p></div></aside><article className="panel lesson-article"><div className="lesson-article-meta"><span className="badge">第 {index+1} 章 / 共 {course.lessons.length} 章</span><span><Clock3 size={13}/>{lesson.minutes} 分钟</span></div><h2>{lesson.title}</h2><p className="lesson-lead">带着问题阅读，让知识与自己的经验相遇。</p><div className="lesson-body">{lesson.paragraphs.map((p,i)=><section key={p}><span className="paragraph-number">0{i+1}</span><p>{p}</p></section>)}</div><div className="takeaway"><span>✦ 本章要点</span><p>{lesson.takeaway}</p></div><LessonNotes lessonId={lesson.id}/><div className="lesson-footer"><button className="text-button" disabled={index === 0} onClick={() => setIndex(index-1)}><ArrowLeft size={13}/>上一章</button>{done ? index < course.lessons.length - 1 ? <button className="button primary" onClick={() => setIndex(index+1)}>下一章<ArrowRight size={13}/></button> : <button className="button primary" onClick={onExam}>前往考试中心<ArrowRight size={13}/></button> : <button className="button primary" disabled={!canComplete} onClick={() => {completeLesson(lesson.id); if(index < course.lessons.length-1) setIndex(index+1);}}><CheckCircle2 size={14}/>{index === course.lessons.length-1 ? '完成课程' : '完成本章，继续学习'}</button>}</div>{!canComplete && !done && <p className="completion-message">请先完成前面的章节，再标记本章完成。</p>}{courseProgress(course,state.completed) === 100 && <div className="callout"><CheckCircle2 size={16}/> 课程已完成！去考试中心检验所学，领取属于你的成长证书。</div>}</article></div></>;
+  const canComplete = course.lessons.slice(0, index).every((l) => state.completed.includes(l.id));
+  return (
+    <>
+      <button className="text-button back-link" onClick={() => onSelect(null)}>
+        <ArrowLeft size={14} />
+        返回我的学习
+      </button>
+      <PageIntro
+        title={course.title}
+        subtitle={course.subtitle}
+        eyebrow="FOCUS ON YOUR NEXT STEP"
+      />
+      <div className="lesson-workspace">
+        <aside className="panel lesson-sidebar">
+          <div className="lesson-sidebar-title">
+            <h3>课程目录</h3>
+            <span>{courseProgress(course, state.completed)}%</span>
+          </div>
+          <div className="progress-track">
+            <span style={{ width: courseProgress(course, state.completed) + '%' }} />
+          </div>
+          <nav aria-label="章节导航">
+            {course.lessons.map((l, i) => (
+              <button
+                key={l.id}
+                className={`lesson-nav ${index === i ? 'active' : ''}`}
+                aria-current={index === i ? 'step' : undefined}
+                onClick={() => setIndex(i)}
+              >
+                {state.completed.includes(l.id) ? <CheckCircle2 size={16} /> : <Circle size={16} />}
+                <span>
+                  <strong>
+                    {String(i + 1).padStart(2, '0')} · {l.title}
+                  </strong>
+                  <small>{l.minutes} 分钟 · 图文课程</small>
+                </span>
+              </button>
+            ))}
+          </nav>
+          <div className="lesson-sidebar-tip">
+            <BookOpen size={16} />
+            <p>
+              慢慢读，认真想。
+              <br />
+              学习不止于完成。
+            </p>
+          </div>
+        </aside>
+        <article className="panel lesson-article">
+          <div className="lesson-article-meta">
+            <span className="badge">
+              第 {index + 1} 章 / 共 {course.lessons.length} 章
+            </span>
+            <span>
+              <Clock3 size={13} />
+              {lesson.minutes} 分钟
+            </span>
+          </div>
+          <h2>{lesson.title}</h2>
+          <p className="lesson-lead">带着问题阅读，让知识与自己的经验相遇。</p>
+          <div className="lesson-body">
+            {lesson.paragraphs.map((p, i) => (
+              <section key={p}>
+                <span className="paragraph-number">0{i + 1}</span>
+                <p>{p}</p>
+              </section>
+            ))}
+          </div>
+          <div className="takeaway">
+            <span>✦ 本章要点</span>
+            <p>{lesson.takeaway}</p>
+          </div>
+          <LessonNotes lessonId={lesson.id} />
+          <div className="lesson-footer">
+            <button
+              className="text-button"
+              disabled={index === 0}
+              onClick={() => setIndex(index - 1)}
+            >
+              <ArrowLeft size={13} />
+              上一章
+            </button>
+            {done ? (
+              index < course.lessons.length - 1 ? (
+                <button className="button primary" onClick={() => setIndex(index + 1)}>
+                  下一章
+                  <ArrowRight size={13} />
+                </button>
+              ) : (
+                <button className="button primary" onClick={onExam}>
+                  前往考试中心
+                  <ArrowRight size={13} />
+                </button>
+              )
+            ) : (
+              <button
+                className="button primary"
+                disabled={!canComplete}
+                onClick={() => {
+                  completeLesson(lesson.id);
+                  if (index < course.lessons.length - 1) setIndex(index + 1);
+                }}
+              >
+                <CheckCircle2 size={14} />
+                {index === course.lessons.length - 1 ? '完成课程' : '完成本章，继续学习'}
+              </button>
+            )}
+          </div>
+          {!canComplete && !done && (
+            <p className="completion-message">请先完成前面的章节，再标记本章完成。</p>
+          )}
+          {courseProgress(course, state.completed) === 100 && (
+            <div className="callout">
+              <CheckCircle2 size={16} /> 课程已完成！去考试中心检验所学，领取属于你的成长证书。
+            </div>
+          )}
+        </article>
+      </div>
+    </>
+  );
 }
