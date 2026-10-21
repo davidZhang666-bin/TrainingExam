@@ -35,6 +35,8 @@ export function LearningProvider({ children }: { children: ReactNode }) {
       if (s.completed.includes(id)) return s;
       const course = courses.find(c => c.lessons.some(l => l.id === id)); const lesson = course?.lessons.find(l => l.id === id);
       if (!course || !lesson || !s.enrolled.includes(course.id)) return s;
+      const index = course.lessons.findIndex(l => l.id === id);
+      if (course.lessons.slice(0, index).some(l => !s.completed.includes(l.id))) return s;
       return { ...s, completed: [...s.completed, id], activity: [...s.activity, { date: localDate(), courseId: course.id, minutes: lesson.minutes }] };
     }),
     saveNote: (id, text) => setState(s => ({ ...s, notes: { ...s.notes, [id]: text } })),
