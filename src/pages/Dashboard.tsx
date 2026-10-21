@@ -3,6 +3,7 @@ import { useLearning } from '../store';
 import { courses, courseProgress, exams, type Page } from '../domain';
 import { HeroArt } from '../components/Artwork';
 import ActivityChart from '../components/ActivityChart';
+import StudyPlan from '../components/StudyPlan';
 export default function Dashboard({ navigate, onLearn }: { navigate: (p: Page) => void; onLearn: (id: string) => void }) {
   const { state } = useLearning();
   const total = state.activity.reduce((s, a) => s + a.minutes, 0);
@@ -18,5 +19,5 @@ export default function Dashboard({ navigate, onLearn }: { navigate: (p: Page) =
   return <div className="dashboard"><section className="page-intro"><div><span className="eyebrow">A LITTLE PROGRESS, EVERY DAY</span><h1>{state.profile.name}，今天也要向前一步 <span className="greeting-dot">✦</span></h1><p>欢迎回来，新的知识与可能正在等你发现。</p></div><span className="date-label"><CalendarDays size={14} />{new Date().toLocaleDateString('zh-CN', { month: 'long', day: 'numeric', weekday: 'long' })}</span></section>
     <section className="hero"><div className="hero-copy"><span className="hero-label"><span /> YOUR NEXT CHAPTER</span><h2>把学习，变成成长的日常。</h2><p>每一份好奇，都值得认真对待。<br/>从一门好课开始，积蓄面向未来的力量。</p><div className="hero-actions"><button className="button light" onClick={() => remaining ? onLearn(remaining.id) : navigate('catalog')}>继续我的学习 <ArrowRight size={14} /></button><span>每天进步一点点 ↗</span></div></div><HeroArt /><div className="hero-annotation">✧ STAY CURIOUS. KEEP GROWING.</div></section>
     <div className="metrics-grid">{metrics.map(m => <section className="panel metric-card" key={m.title}><div className="metric-top"><span>{m.title}</span><span className={`metric-icon ${m.color}`}><m.icon size={18} strokeWidth={1.6} /></span></div><div className="metric-value">{m.value}<small>{m.unit}</small></div><p>{m.title === '累计学习' && <TrendingUp size={11}/>} {m.note}</p></section>)}</div>
-    <div className="dashboard-body"><div className="dashboard-main"><ActivityChart /></div><div className="dashboard-aside" /></div></div>;
+    <div className="dashboard-body"><div className="dashboard-main"><ActivityChart /></div><div className="dashboard-aside"><StudyPlan navigate={navigate} onLearn={onLearn}/></div></div></div>;
 }
