@@ -1,20 +1,8 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
 import { courses, type LearningState, type Profile, type Draft, type Attempt } from './domain';
 
-export const STORAGE_KEY = 'zhixu-learning-v1';
-export const localDate = (date = new Date()) => `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
-export function initialState(): LearningState {
-  return {
-    version: 1, profile: { name: '林小满', department: '产品与体验部', role: '产品设计师', goal: 120, reminder: true },
-    enrolled: ['design', 'data', 'security'], completed: ['design-1', 'data-1', 'data-2'], favorites: [], notes: {}, attempts: [], draft: null,
-    activity: [18, 28, 0, 42, 24, 36, 20].map((minutes, i) => { const date = new Date(); date.setDate(date.getDate() - 6 + i); return { date: localDate(date), minutes, courseId: i % 2 ? 'data' : 'design' }; }),
-    readNotifications: [],
-  };
-}
-export function loadState(): LearningState {
-  try { const raw = localStorage.getItem(STORAGE_KEY); const value = raw ? JSON.parse(raw) : null; return value?.version === 1 && Array.isArray(value.completed) ? { ...initialState(), ...value } : initialState(); }
-  catch { return initialState(); }
-}
+import { initialState, loadState, localDate, STORAGE_KEY } from './persistence';
+export { initialState, loadState, localDate, STORAGE_KEY } from './persistence';
 type Store = {
   state: LearningState; storageError: boolean;
   enroll: (id: string) => void; toggleFavorite: (id: string) => void;
