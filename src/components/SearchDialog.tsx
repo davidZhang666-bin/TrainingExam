@@ -1,0 +1,11 @@
+import { useState } from 'react';
+import { ArrowUpRight, Search, BookOpen, ClipboardCheck, LayoutGrid, SearchX } from 'lucide-react';
+import { courses, exams, pageNames, type Page } from '../domain';
+import Modal from './Modal';
+export default function SearchDialog({ onClose, onCourse, navigate }: { onClose: () => void; onCourse: (id: string) => void; navigate: (p: Page) => void }) {
+  const [query,setQuery]=useState('');const term=query.trim().toLowerCase();
+  const foundCourses=courses.filter(c=>(c.title+c.instructor+c.category+c.skills.join('')).toLowerCase().includes(term));
+  const foundExams=exams.filter(e=>(e.title+e.category).toLowerCase().includes(term));
+  const foundPages=(Object.entries(pageNames) as [Page,string][]).filter(([,label])=>label.includes(term));
+  return <Modal title="全局搜索" onClose={onClose} className="search-dialog"><label className="global-search-input"><Search size={21}/><input data-autofocus aria-label="搜索课程、考试或页面" placeholder="搜索课程、考试，或你想去的地方…" value={query} onChange={e=>setQuery(e.target.value)}/><kbd>ESC</kbd></label><div className="search-results">{foundCourses.length>0 && <section><h3>课程</h3>{foundCourses.map(c=><button key={c.id} onClick={()=>{onClose();onCourse(c.id);}}><span className="search-result-icon"><BookOpen size={16}/></span><div><strong>{c.title}</strong><small>{c.instructor} · {c.category}</small></div><ArrowUpRight size={14}/></button>)}</section>}{foundExams.length>0 && <section><h3>测评</h3>{foundExams.map(e=><button key={e.id} onClick={()=>{onClose();navigate('exams');}}><span className="search-result-icon"><ClipboardCheck size={16}/></span><div><strong>{e.title}</strong><small>{e.questions.length} 道题 · {e.minutes} 分钟</small></div><ArrowUpRight size={14}/></button>)}</section>}{foundPages.length>0 && <section><h3>快速前往</h3>{foundPages.map(([page,label])=><button key={page} onClick={()=>{onClose();navigate(page);}}><span className="search-result-icon"><LayoutGrid size={16}/></span><strong>{label}</strong><ArrowUpRight size={14}/></button>)}</section>}{!foundCourses.length&&!foundExams.length&&!foundPages.length && <div className="empty-state compact"><SearchX size={28}/><h3>没有找到相关内容</h3><p>换个关键词再试试，例如「数据」或「证书」。</p></div>}</div><div className="search-dialog-footer">用好奇心，发现更多可能。<span>Ctrl / ⌘ K 打开搜索</span></div></Modal>;
+}
