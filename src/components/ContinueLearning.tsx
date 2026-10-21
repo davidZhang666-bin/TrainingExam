@@ -1,0 +1,9 @@
+import { ArrowRight, Play } from 'lucide-react';
+import { courses, courseProgress, type Page } from '../domain';
+import { useLearning } from '../store';
+import { CourseArt } from './Artwork';
+import CourseCard from './CourseCard';
+export default function ContinueLearning({ navigate, onLearn, onOpen }: { navigate: (p: Page) => void; onLearn: (id: string) => void; onOpen: (id: string) => void }) {
+  const { state } = useLearning(); const active = courses.filter(c => state.enrolled.includes(c.id) && courseProgress(c, state.completed) < 100);
+  return <><section className="panel continue-panel"><div className="panel-heading"><h2>继续学习 <span className="section-kicker">PICK UP WHERE YOU LEFT OFF</span></h2><button className="text-button" onClick={() => navigate('learning')}>全部课程 <ArrowRight size={12}/></button></div>{active.slice(0,2).map(c => <div className="continue-row" key={c.id}><button className={`continue-cover ${c.color}`} onClick={() => onLearn(c.id)} aria-label={`继续学习${c.title}`}><CourseArt kind={c.art}/></button><div className="continue-info"><span>{c.category}</span><h3>{c.title}</h3><p>下一章：{c.lessons.find(l => !state.completed.includes(l.id))?.title}</p><div className="continue-progress"><div className="progress-track"><span style={{width:`${courseProgress(c,state.completed)}%`}}/></div><small>{courseProgress(c,state.completed)}%</small></div></div><button className="play-button" aria-label={`开始学习${c.title}`} onClick={() => onLearn(c.id)}><Play size={13} fill="currentColor"/></button></div>)}{!active.length && <div className="callout">太棒了，你已完成全部在学课程。去探索下一门好课吧。</div>}</section><section><div className="panel-heading"><h2>为好奇心，选一门好课 <span className="section-kicker">CURATED FOR YOU</span></h2><button className="text-button" onClick={() => navigate('catalog')}>发现更多 <ArrowRight size={12}/></button></div><div className="recommend-grid">{courses.slice(2).map(c => <CourseCard key={c.id} course={c} onOpen={onOpen}/>)}</div></section></>;
+}
