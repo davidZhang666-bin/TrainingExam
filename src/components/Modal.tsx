@@ -1,4 +1,5 @@
 import { useEffect, useRef, type ReactNode } from 'react';
+import { createPortal } from 'react-dom';
 import { X } from 'lucide-react';
 export default function Modal({ title, onClose, children, className = '' }: { title: string; onClose: () => void; children: ReactNode; className?: string }) {
   const ref = useRef<HTMLElement>(null);
@@ -25,5 +26,5 @@ export default function Modal({ title, onClose, children, className = '' }: { ti
     document.addEventListener('keydown', handler);
     return () => { document.body.style.overflow = overflow; background.forEach((el,i) => { el.inert = previousInert[i]; }); document.removeEventListener('keydown', handler); if (previous?.isConnected) previous.focus(); };
   }, []);
-  return <div className="modal-backdrop" onMouseDown={e => { if (e.target === e.currentTarget) closeRef.current(); }}><section className={'modal ' + className} role="dialog" aria-modal="true" aria-label={title} tabIndex={-1} ref={ref}><button className="icon-button modal-close" aria-label={'关闭'+title} onClick={onClose}><X size={20}/></button>{children}</section></div>;
+  return createPortal(<div className="modal-backdrop" onMouseDown={e => { if (e.target === e.currentTarget) closeRef.current(); }}><section className={'modal ' + className} role="dialog" aria-modal="true" aria-label={title} tabIndex={-1} ref={ref}><button className="icon-button modal-close" aria-label={'关闭'+title} onClick={onClose}><X size={20}/></button>{children}</section></div>, document.body);
 }
