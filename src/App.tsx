@@ -13,6 +13,11 @@ import {
   Bell,
   Menu,
   Sparkles,
+  CalendarDays,
+  NotebookPen,
+  BrainCircuit,
+  Route,
+  ClipboardPen,
 } from 'lucide-react';
 import { LearningProvider, useLearning } from './store';
 import { pageNames, type Page } from './domain';
@@ -30,11 +35,22 @@ import Notifications from './components/Notifications';
 import { getNotifications } from './notifications';
 import Modal from './components/Modal';
 import { useExamDeadline } from './useExamDeadline';
+import StudyPlanner from './pages/StudyPlanner';
+import Notebook from './pages/Notebook';
+import Practice from './pages/Practice';
+import LearningPaths from './pages/LearningPaths';
+import Assignments from './pages/Assignments';
+import './workspace/workspace.css';
 
 const navigation = [
   { page: 'dashboard', icon: LayoutDashboard },
   { page: 'catalog', icon: BookOpen },
   { page: 'learning', icon: GraduationCap },
+  { page: 'paths', icon: Route },
+  { page: 'planner', icon: CalendarDays },
+  { page: 'notebook', icon: NotebookPen },
+  { page: 'practice', icon: BrainCircuit },
+  { page: 'assignments', icon: ClipboardPen },
   { page: 'exams', icon: ClipboardCheck },
   { page: 'certificates', icon: Award },
   { page: 'analytics', icon: ChartNoAxesCombined },
@@ -221,6 +237,21 @@ function Workspace() {
             <SettingsPage />
           ) : page === 'analytics' ? (
             <Analytics onLearn={learn} />
+          ) : page === 'planner' ? (
+            <StudyPlanner
+              onLearn={(id) => {
+                enroll(id);
+                learn(id);
+              }}
+            />
+          ) : page === 'notebook' ? (
+            <Notebook />
+          ) : page === 'practice' ? (
+            <Practice />
+          ) : page === 'paths' ? (
+            <LearningPaths onLearn={learn} onExam={() => navigate('exams')} />
+          ) : page === 'assignments' ? (
+            <Assignments />
           ) : page === 'certificates' ? (
             <Certificates onExams={() => navigate('exams')} />
           ) : page === 'exams' ? (

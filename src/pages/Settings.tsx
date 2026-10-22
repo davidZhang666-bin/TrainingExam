@@ -147,7 +147,9 @@ export default function Settings() {
       <section className="panel data-settings">
         <div>
           <h3>演示数据管理</h3>
-          <p>恢复初始示例会清除当前浏览器中的笔记、进度、考试记录和个人设置。</p>
+          <p>
+            恢复初始示例会清除当前浏览器的学习进度、计划、笔记、练习、作业、路径、考试记录和个人设置。
+          </p>
         </div>
         <button
           className="button"

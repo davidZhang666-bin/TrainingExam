@@ -73,9 +73,15 @@ export default function DataBackup({ onRestore }: { onRestore: (data: LearningSt
             <br />
             {candidate.profile.name} · {candidate.enrolled.length} 门课程 ·{' '}
             {candidate.completed.length} 个完成章节 · {candidate.attempts.length} 次测评
+            <br />
+            {candidate.studyTasks.length} 项计划 · {candidate.notebook.length} 条笔记 ·{' '}
+            {candidate.practiceHistory.length} 次练习
+            <br />
+            {candidate.assignmentSubmissions.length} 份作业自评 ·{' '}
+            {Object.keys(candidate.pathEnrollments).length} 条学习路径
           </div>
           <p>
-            导入将覆盖当前浏览器的全部学习数据，包括正在进行的考试。建议先导出现有备份。备份中的过期考试将在恢复后自动交卷。
+            导入将覆盖全部学习数据，包括考试和练习草稿、作业与反思。建议先导出现有备份。备份中的过期考试将在恢复后自动交卷。
           </p>
           <div className="dialog-actions">
             <button className="button" onClick={() => setCandidate(null)}>
