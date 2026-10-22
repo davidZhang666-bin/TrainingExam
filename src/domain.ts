@@ -1,5 +1,16 @@
 export type Page =
-  'dashboard' | 'catalog' | 'learning' | 'exams' | 'certificates' | 'analytics' | 'settings';
+  | 'dashboard'
+  | 'catalog'
+  | 'learning'
+  | 'exams'
+  | 'practice'
+  | 'planner'
+  | 'notebook'
+  | 'paths'
+  | 'assignments'
+  | 'certificates'
+  | 'analytics'
+  | 'settings';
 export interface Lesson {
   id: string;
   title: string;
@@ -74,6 +85,14 @@ export interface LearningState {
   draft: Draft | null;
   activity: Activity[];
   readNotifications: string[];
+  studyTasks: import('./features/planner/types').StudyTask[];
+  notebook: import('./features/notebook/types').NotebookNote[];
+  practiceHistory: import('./features/practice/types').PracticeRecord[];
+  practiceSession: import('./features/practice/types').PracticeSession | null;
+  reviewSchedule: import('./features/practice/types').ReviewItem[];
+  assignmentDrafts: import('./features/assignments/types').AssignmentDraft[];
+  assignmentSubmissions: import('./features/assignments/types').AssignmentSubmission[];
+  pathEnrollments: Record<string, import('./features/paths/types').PathEnrollment>;
 }
 
 export const pageNames: Record<Page, string> = {
@@ -83,6 +102,11 @@ export const pageNames: Record<Page, string> = {
   exams: '考试中心',
   certificates: '我的证书',
   analytics: '学习报告',
+  planner: '学习计划',
+  practice: '专项练习',
+  notebook: '学习笔记',
+  paths: '学习路径',
+  assignments: '实践作业',
   settings: '个人设置',
 };
 

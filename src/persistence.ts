@@ -1,5 +1,11 @@
 import { courses, exams, type LearningState, type Draft, type Attempt } from './domain';
 import { gradeExam } from './assessment';
+import { parseTask } from './features/planner/validation';
+import { parseNote } from './features/notebook/validation';
+import { parsePracticeRecord, parseSession } from './features/practice/session';
+import { reviewSchedule } from './features/practice/scheduling';
+import { parseAssignmentDraft, parseSubmission } from './features/assignments/validation';
+import { learningPaths } from './features/paths/catalog';
 export const STORAGE_KEY = 'zhixu-learning-v1';
 export const RECOVERY_KEY = STORAGE_KEY + '-recovery';
 export const localDate = (date = new Date()) =>
@@ -30,6 +36,14 @@ export function initialState(): LearningState {
       return { date: localDate(date), minutes, courseId: i % 2 ? 'data' : 'design' };
     }),
     readNotifications: [],
+    studyTasks: [],
+    notebook: [],
+    practiceHistory: [],
+    practiceSession: null,
+    reviewSchedule: [],
+    assignmentDrafts: [],
+    assignmentSubmissions: [],
+    pathEnrollments: {},
   };
 }
 const record = (v: unknown): Record<string, unknown> =>
@@ -135,6 +149,8 @@ export function normalizeState(input: unknown): LearningState {
     )
       activity.push({ date: a.date, minutes: a.minutes, courseId: a.courseId });
   }
+  const practiceHistory = uniqueParsed(raw.practiceHistory, parsePracticeRecord, 5000);
+  const practiceSession = parseSession(raw.practiceSession);
   return {
     ...base,
     enrolled,
@@ -145,6 +161,17 @@ export function normalizeState(input: unknown): LearningState {
     activity,
     favorites: strings(raw.favorites, ids),
     readNotifications: strings(raw.readNotifications),
+    studyTasks: uniqueParsed(raw.studyTasks, parseTask, 5000),
+    notebook: uniqueParsed(raw.notebook, parseNote, 2000),
+    practiceHistory,
+    practiceSession:
+      practiceSession && !practiceHistory.some((item) => item.id === practiceSession.id)
+        ? practiceSession
+        : null,
+    reviewSchedule: reviewSchedule(practiceHistory),
+    assignmentDrafts: uniqueParsed(raw.assignmentDrafts, parseAssignmentDraft, 100),
+    assignmentSubmissions: uniqueParsed(raw.assignmentSubmissions, parseSubmission, 2000),
+    pathEnrollments: normalizePathEnrollments(raw.pathEnrollments),
     profile: {
       name: text(profile.name, base.profile.name, 20),
       department: text(profile.department, base.profile.department),
@@ -159,6 +186,43 @@ export function normalizeState(input: unknown): LearningState {
       reminder: typeof profile.reminder === 'boolean' ? profile.reminder : true,
     },
   };
+}
+
+function uniqueParsed<T>(
+  value: unknown,
+  parse: (item: unknown) => T | null,
+  limit: number,
+  key: (item: T) => string = (item) => (item as { id: string }).id,
+): T[] {
+  if (!Array.isArray(value)) return [];
+  const seen = new Set<string>();
+  const result: T[] = [];
+  for (const item of value.slice(-limit)) {
+    const entry = parse(item);
+    const id = entry ? key(entry) : '';
+    if (entry && id && !seen.has(id)) {
+      seen.add(id);
+      result.push(entry);
+    }
+  }
+  return result;
+}
+
+function normalizePathEnrollments(value: unknown): LearningState['pathEnrollments'] {
+  const input = record(value);
+  const valid = new Set(learningPaths.map((path) => path.id));
+  return Object.fromEntries(
+    Object.entries(input).flatMap(([id, entry]) => {
+      const raw = record(entry);
+      return valid.has(id) &&
+        typeof raw.id === 'string' &&
+        raw.id.length <= 150 &&
+        typeof raw.startedAt === 'string' &&
+        Number.isFinite(Date.parse(raw.startedAt))
+        ? [[id, { id: raw.id, startedAt: new Date(raw.startedAt).toISOString() }]]
+        : [];
+    }),
+  );
 }
 export function loadState(): LearningState {
   let raw: string | null = null;
